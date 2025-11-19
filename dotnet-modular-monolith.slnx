@@ -1,0 +1,25 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/modules/" />
+  <Folder Name="/src/modules/ModuleName/">
+    <Project Path="src/modules/ModuleName/ModuleName.Application/ModuleName.Application.csproj" />
+    <Project Path="src/modules/ModuleName/ModuleName.Domain/ModuleName.Domain.csproj" />
+    <Project Path="src/modules/ModuleName/ModuleName.Infrastructure/ModuleName.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/presentation/">
+    <Project Path="src/presentation/SolutionName.Api/SolutionName.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/shared/">
+    <Project Path="src/shared/Shared.Abstractions/Shared.Abstractions.csproj" />
+    <Project Path="src/shared/Shared.Application/Shared.Application.csproj" />
+    <Project Path="src/shared/Shared.Domain/Shared.Domain.csproj" />
+    <Project Path="src/shared/Shared.Infrastructure/Shared.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tools/" />
+  <Folder Name="/tools/database/">
+    <Project Path="tools/database/SolutionName.Migrations/SolutionName.Migrations.csproj" />
+  </Folder>
+  <!--<Folder Name="/tools/hosting/">
+    <Project Path="tools/hosting/SolutionName.AppHost/SolutionName.AppHost.csproj" />
+  </Folder>-->
+</Solution>

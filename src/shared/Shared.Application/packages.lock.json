@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "shared.abstractions": {
+        "type": "Project"
+      },
+      "shared.domain": {
+        "type": "Project"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.0.0" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsAspireHost>true</IsAspireHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../src/presentation/SolutionName.Api/SolutionName.Api.csproj.csproj" />
+    <ProjectReference Include="../../database/SolutionName.Migrations/SolutionName.Migrations.csproj.csproj" />
+  </ItemGroup>
+</Project>

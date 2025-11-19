@@ -1,0 +1,37 @@
+<Project>
+    <PropertyGroup>
+        <!-- Common project configuration, used in every project -->
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+        <CodeAnalysisTreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</CodeAnalysisTreatWarningsAsErrors>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <AnalysisMode>recommended</AnalysisMode>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Global usings -->
+        <!--<Using Include="Core" />-->
+    </ItemGroup>
+    <!-- Automatic attach for Husky Git Hooks -->
+    <!--<Target
+        Name="husky"
+        BeforeTargets="Restore;CollectPackageReferences"
+        Condition="'$(HUSKY)' != 0"
+    >
+        <Exec
+            Command="dotnet tool restore"
+            WorkingDirectory="$(SolutionDir)"
+            StandardOutputImportance="Low"
+            StandardErrorImportance="High"
+        />
+        <Exec
+            Command="dotnet husky install"
+            WorkingDirectory="$(SolutionDir)"
+            StandardOutputImportance="Low"
+            StandardErrorImportance="High"
+        />
+    </Target>-->
+</Project>

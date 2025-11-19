@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <!-- Global usings -->
+        <Using Include="Shared.Abstractions" />
+        <Using Include="Shared.Domain" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="../Shared.Abstractions/Shared.Abstractions.csproj" />
+        <ProjectReference Include="../Shared.Domain/Shared.Domain.csproj" />
+    </ItemGroup>
+</Project>
