@@ -7,35 +7,35 @@ public static partial class ResultExtensions
     {
         public IResult<T> Ensure(Func<T, bool> predicate, IError error)
         {
-            if (!Result.TryUnwrap(result, out var value))
+            if (result is not ISuccess<T> success)
                 return result;
 
-            var match = predicate(value);
+            var match = predicate(success.Value);
 
             return match ? result : Result.Failure<T>(error);
         }
 
         public async Task<IResult<T>> Ensure(Func<T, Task<bool>> predicate, IError error)
         {
-            if (!Result.TryUnwrap(result, out var value))
+            if (result is not ISuccess<T> success)
                 return result;
 
-            var match = await predicate(value);
+            var match = await predicate(success.Value);
 
             return match ? result : Result.Failure<T>(error);
         }
 
         public IResult<T> Ensure(Func<T, bool> predicate, Func<T, IError> mapError)
         {
-            if (!Result.TryUnwrap(result, out var value))
+            if (result is not ISuccess<T> success)
                 return result;
 
-            var match = predicate(value);
+            var match = predicate(success.Value);
 
             if (match)
                 return result;
 
-            var error = mapError(value);
+            var error = mapError(success.Value);
 
             return Result.Failure<T>(error);
         }
@@ -45,15 +45,15 @@ public static partial class ResultExtensions
             Func<T, IError> mapError
         )
         {
-            if (!Result.TryUnwrap(result, out var value))
+            if (result is not ISuccess<T> success)
                 return result;
 
-            var match = await predicate(value);
+            var match = await predicate(success.Value);
 
             if (match)
                 return result;
 
-            var error = mapError(value);
+            var error = mapError(success.Value);
 
             return Result.Failure<T>(error);
         }
@@ -63,15 +63,15 @@ public static partial class ResultExtensions
             Func<T, Task<IError>> mapError
         )
         {
-            if (!Result.TryUnwrap(result, out var value))
+            if (result is not ISuccess<T> success)
                 return result;
 
-            var match = predicate(value);
+            var match = predicate(success.Value);
 
             if (match)
                 return result;
 
-            var error = await mapError(value);
+            var error = await mapError(success.Value);
 
             return Result.Failure<T>(error);
         }
@@ -81,15 +81,15 @@ public static partial class ResultExtensions
             Func<T, Task<IError>> mapError
         )
         {
-            if (!Result.TryUnwrap(result, out var value))
+            if (result is not ISuccess<T> success)
                 return result;
 
-            var match = await predicate(value);
+            var match = await predicate(success.Value);
 
             if (match)
                 return result;
 
-            var error = await mapError(value);
+            var error = await mapError(success.Value);
 
             return Result.Failure<T>(error);
         }

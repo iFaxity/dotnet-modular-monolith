@@ -13,8 +13,6 @@ public static partial class MaybeExtensions
         /// <summary>
         /// Executes an action if the maybe has a value.
         /// </summary>
-        /// <typeparam name="T">The type of the maybe value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="action">The action to execute.</param>
         /// <returns>The original maybe instance.</returns>
         public IMaybe<T> IfSome(Action<T> action)
@@ -31,8 +29,6 @@ public static partial class MaybeExtensions
         /// <summary>
         /// Executes an async action if the maybe has a value.
         /// </summary>
-        /// <typeparam name="T">The type of the maybe value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="action">The asynchronous action to execute.</param>
         /// <returns>A task returning the original maybe instance.</returns>
         public Task<IMaybe<T>> IfSome(Func<T, Task> action)

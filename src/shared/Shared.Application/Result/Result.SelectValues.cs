@@ -15,7 +15,8 @@ public static partial class ResultExtensions
         /// Failed results are discarded.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<T> SelectValues() => results.SelectMany(result => result);
+        public IEnumerable<T> SelectValues() =>
+            results.OfType<ISuccess<T>>().Select(success => success.Value);
     }
 
     extension<T>(Task<IEnumerable<IResult<T>>> resultsTask)

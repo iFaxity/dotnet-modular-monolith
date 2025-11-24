@@ -32,8 +32,8 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IResult<T> IfSuccess(Action<T> action)
         {
-            if (Result.TryUnwrap(result, out var value))
-                action(value);
+            if (result is ISuccess<T> success)
+                action(success.Value);
 
             return result;
         }
@@ -41,8 +41,8 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<IResult<T>> IfSuccess(Func<T, Task> action)
         {
-            if (Result.TryUnwrap(result, out var value))
-                await action(value);
+            if (result is ISuccess<T> success)
+                await action(success.Value);
 
             return result;
         }

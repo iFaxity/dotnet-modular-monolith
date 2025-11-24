@@ -1,22 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Shared.Application;
 
 public static class Maybe
 {
-    internal static bool TryUnwrap<T>(IMaybe<T> maybe, [NotNullWhen(true)] out T? value)
-        where T : notnull
-    {
-        value = default;
-
-        if (maybe.IsNone)
-            return false;
-
-        value = maybe.Unwrap()!;
-        return true;
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IMaybe<T> From<T>(T? value)
         where T : notnull

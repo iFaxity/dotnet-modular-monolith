@@ -15,7 +15,6 @@ public static partial class MaybeExtensions
         /// </summary>
         /// <typeparam name="T">The type of the current value.</typeparam>
         /// <typeparam name="TResult">The type of the resulting maybe value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="functor">The function that returns a new maybe.</param>
         /// <returns>The resulting maybe or <c>None</c>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -27,7 +26,6 @@ public static partial class MaybeExtensions
         /// </summary>
         /// <typeparam name="T">The type of the current value.</typeparam>
         /// <typeparam name="TResult">The type of the resulting maybe value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="functor">The asynchronous function returning a new maybe.</param>
         /// <returns>A task returning the resulting maybe or <c>None</c>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

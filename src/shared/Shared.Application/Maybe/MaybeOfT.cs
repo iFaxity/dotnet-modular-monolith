@@ -1,5 +1,3 @@
-using System.Collections;
-
 namespace Shared.Application;
 
 /// <summary>
@@ -12,41 +10,33 @@ public readonly record struct Maybe<T> : IMaybe<T>
     /// <summary>
     /// Gets a <see cref="IMaybe{T}"/> instance that represents the absence of a value.
     /// </summary>
-    public static readonly IMaybe<T> None = new Maybe<T>();
+    public static readonly IMaybe<T> None = new Maybe<T>(Application.None.Instance);
 
-    private readonly T? _value;
+    private readonly IMaybe<T> _state;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Maybe{T}"/> struct.
-    /// </summary>
-    /// <param name="value">The value to wrap. If <c>null</c>, the instance will represent <c>None</c>.</param>
-    internal Maybe(T? value)
+    internal Maybe(INone none)
     {
-        if (value is null)
-            return;
-
-        _value = value;
+        _state = (IMaybe<T>)none;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Maybe{T}"/> struct.
-    /// </summary>
-    /// <param name="maybe">The maybe to copy.</param>
     internal Maybe(IMaybe<T> maybe)
     {
-        if (Maybe.TryUnwrap(maybe, out var value))
-            _value = value;
+        // Unwrap the error to be a correct copy constructor and avoid nested maybes
+        _state = maybe switch
+        {
+            ISome<T> some => new Some<T>(some.Value),
+            INone => None,
+            _ => throw new InvalidOperationException(),
+        };
     }
 
-    /// <summary>
-    /// Gets a value indicating whether the current instance contains a value.
-    /// </summary>
-    public bool IsSome => _value is not null;
+    internal Maybe(T? value)
+    {
+        _state = value is null ? None : new Some<T>(value);
+    }
 
-    /// <summary>
-    /// Gets a value indicating whether the current instance does not contain a value.
-    /// </summary>
-    public bool IsNone => _value is null;
+    public bool IsSome => _state.IsSome;
+    public bool IsNone => _state.IsNone;
 
     /// <summary>
     /// Implicitly converts a value of type <typeparamref name="T"/> to a <see cref="Maybe{T}"/>.
@@ -54,46 +44,23 @@ public readonly record struct Maybe<T> : IMaybe<T>
     /// <param name="value">The value to convert.</param>
     public static implicit operator Maybe<T>(T? value)
     {
+        if (value is null)
+            return new(Application.None.Instance);
+
         return new(value);
-    }
-
-    /// <summary>
-    /// Returns the value if the maybe is Some, otherwise throws an exception.
-    /// </summary>
-    /// <returns>The contained value.</returns>
-    /// <exception cref="MaybeNoneException"> when <see cref="IsNone"/> is <c>true</c>.</exception>
-    public T Unwrap()
-    {
-        return _value ?? throw new MaybeNoneException();
-    }
-
-    /// <summary>
-    /// Returns an enumerator that iterates through the value if it is present.
-    /// </summary>
-    /// <returns>An enumerator for the value or an empty enumerator if <c>None</c>.</returns>
-    IEnumerator<T> IEnumerable<T>.GetEnumerator()
-    {
-        if (_value is null)
-            yield break;
-
-        yield return _value;
-    }
-
-    /// <summary>
-    /// Returns a non-generic enumerator that iterates through the value if it is present.
-    /// </summary>
-    /// <returns>An enumerator for the value or an empty enumerator if <c>None</c>.</returns>
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable<T>)this).GetEnumerator();
     }
 
     /// <summary>
     /// Returns a string representation of the <see cref="Maybe{T}"/>.
     /// </summary>
     /// <returns>A string representing the value.</returns>
-    public override string ToString()
+    public override string? ToString()
     {
-        return _value is null ? $"None<{typeof(T).Name}>()" : $"Some({_value})";
+        return _state switch
+        {
+            ISome<T> some => $"Some({some.Value})",
+            INone => $"None<{typeof(T).Name}>()",
+            _ => throw new InvalidOperationException(),
+        };
     }
 }

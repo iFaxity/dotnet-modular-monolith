@@ -13,10 +13,12 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TResult ThrowIfFailure()
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return result;
-
-            throw new ResultFailedException(error);
+            return result switch
+            {
+                ISuccess => result,
+                IFailure failure => throw new ResultFailedException(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
     }
 

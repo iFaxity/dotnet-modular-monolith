@@ -15,6 +15,7 @@ public static partial class MaybeExtensions
         /// <c>None</c>s are discarded.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<T> SelectValues() => maybes.SelectMany(m => m);
+        public IEnumerable<T> SelectValues() =>
+            maybes.OfType<ISome<T>>().Select(some => some.Value);
     }
 }

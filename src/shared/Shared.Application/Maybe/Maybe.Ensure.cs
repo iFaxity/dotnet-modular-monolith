@@ -13,10 +13,10 @@ public static partial class MaybeExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IMaybe<T> Ensure(Func<T, bool> predicate)
         {
-            if (!Maybe.TryUnwrap(maybe, out var value))
+            if (maybe is not ISome<T> some)
                 return maybe;
 
-            var match = predicate(value);
+            var match = predicate(some.Value);
 
             return match ? maybe : Maybe.None<T>();
         }
@@ -24,10 +24,10 @@ public static partial class MaybeExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<IMaybe<T>> Ensure(Func<T, Task<bool>> predicate)
         {
-            if (!Maybe.TryUnwrap(maybe, out var value))
+            if (maybe is not ISome<T> some)
                 return maybe;
 
-            var match = await predicate(value);
+            var match = await predicate(some.Value);
 
             return match ? maybe : Maybe.None<T>();
         }

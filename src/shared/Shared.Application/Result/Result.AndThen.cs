@@ -9,48 +9,58 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IResult AndThen(IResult other)
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return other;
-
-            return Result.Failure(error);
+            return result switch
+            {
+                ISuccess => other,
+                IFailure failure => Result.Failure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IResult AndThen(Func<IResult> functor)
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return functor();
-
-            return Result.Failure(error);
+            return result switch
+            {
+                ISuccess => functor(),
+                IFailure failure => Result.Failure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<IResult> AndThen(Func<Task<IResult>> functor)
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return await functor();
-
-            return Result.Failure(error);
+            return result switch
+            {
+                ISuccess => await functor(),
+                IFailure failure => Result.Failure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IResult<T> AndThen<T>(Func<IResult<T>> functor)
             where T : notnull
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return functor();
-
-            return Result.Failure<T>(error);
+            return result switch
+            {
+                ISuccess => functor(),
+                IFailure failure => Result.Failure<T>(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<IResult<T>> AndThen<T>(Func<Task<IResult<T>>> functor)
             where T : notnull
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return await functor();
-
-            return Result.Failure<T>(error);
+            return result switch
+            {
+                ISuccess => await functor(),
+                IFailure failure => Result.Failure<T>(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
     }
 
@@ -106,38 +116,46 @@ public static partial class ResultExtensions
         public IResult<TValue> AndThen<TValue>(Func<T, IResult<TValue>> functor)
             where TValue : notnull
         {
-            if (Result.TryUnwrap(result, out var value))
-                return functor(value);
-
-            return Result.Failure<TValue>(result.UnwrapError());
+            return result switch
+            {
+                ISuccess<T> success => functor(success.Value),
+                IFailure failure => Result.Failure<TValue>(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<IResult<TValue>> AndThen<TValue>(Func<T, Task<IResult<TValue>>> functor)
             where TValue : notnull
         {
-            if (Result.TryUnwrap(result, out var value))
-                return await functor(value);
-
-            return Result.Failure<TValue>(result.UnwrapError());
+            return result switch
+            {
+                ISuccess<T> success => await functor(success.Value),
+                IFailure failure => Result.Failure<TValue>(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IResult AndThen(Func<T, IResult> functor)
         {
-            if (Result.TryUnwrap(result, out var value))
-                return functor(value);
-
-            return Result.Failure(result.UnwrapError());
+            return result switch
+            {
+                ISuccess<T> success => functor(success.Value),
+                IFailure failure => Result.Failure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<IResult> AndThen(Func<T, Task<IResult>> functor)
         {
-            if (Result.TryUnwrap(result, out var value))
-                return await functor(value);
-
-            return Result.Failure(result.UnwrapError());
+            return result switch
+            {
+                ISuccess<T> success => await functor(success.Value),
+                IFailure failure => Result.Failure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
     }
 

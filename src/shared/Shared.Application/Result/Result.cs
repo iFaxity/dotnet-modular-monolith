@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Shared.Application;
@@ -6,59 +5,28 @@ namespace Shared.Application;
 /// <summary>
 /// Represents a result of some operation, with status information and possibly an error.
 /// </summary>
-public readonly record struct Result : IResult
+internal readonly record struct Result : IResult
 {
-    private readonly IError _error;
+    private readonly IResult _state;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Result"/> class with the specified parameters.
-    /// </summary>
-    /// <param name="error">The error.</param>
+    public Result()
+    {
+        _state = new Success();
+    }
+
     private Result(IError error)
     {
-        _error = error;
+        _state = new Failure(error);
     }
 
-    /// <summary>
-    /// Gets a value indicating whether the result is a success result.
-    /// </summary>
-    public bool IsSuccess => DomainError.IsNullOrNone(_error);
-
-    /// <summary>
-    /// Gets a value indicating whether the result is a failure result.
-    /// </summary>
-    public bool IsFailure => !DomainError.IsNullOrNone(_error);
-
-    internal static bool TryUnwrap<T>(IResult<T> result, [NotNullWhen(true)] out T? value)
-        where T : notnull
-    {
-        value = default;
-        if (result.IsFailure)
-            return false;
-
-        value = result.Unwrap()!;
-        return true;
-    }
-
-    internal static bool TryUnwrapError(IResult result, out IError error)
-    {
-        error = DomainError.None;
-
-        if (result.IsSuccess)
-            return false;
-
-        error = result.UnwrapError();
-        return true;
-    }
+    public bool IsSuccess => _state.IsSuccess;
+    public bool IsFailure => _state.IsFailure;
 
     /// <summary>
     /// Returns a success <see cref="IResult"/>.
     /// </summary>
     /// <returns>A new instance of <see cref="IResult"/> with the success flag set.</returns>
-    public static IResult Success()
-    {
-        return new Result(DomainError.None);
-    }
+    public static IResult Success() => new Result();
 
     /// <summary>
     /// Returns a success <see cref="IResult{T}"/> with the specified value.
@@ -68,10 +36,7 @@ public readonly record struct Result : IResult
     /// <returns>A new instance of <see cref="IResult{T}"/> with the success flag set.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IResult<T> Success<T>(T value)
-        where T : notnull
-    {
-        return new Result<T>(value);
-    }
+        where T : notnull => new Result<T>(value);
 
     /// <summary>
     /// Returns a failure <see cref="IResult"/> with the specified error.
@@ -273,22 +238,8 @@ public readonly record struct Result : IResult
     }
 
     /// <summary>
-    /// Gets the result error if the result is a failure, otherwise throws an exception.
+    /// Returns a string representation of the <see cref="Result"/>.
     /// </summary>
-    /// <returns>The result error if the result is a failure.</returns>
-    /// <exception cref="InvalidOperationException"> when <see cref="IsSuccess"/> is <c>true</c>.</exception>
-    public IError UnwrapError()
-    {
-        if (DomainError.IsNullOrNone(_error))
-            throw new InvalidOperationException(
-                "The error of a successful result can not be accessed."
-            );
-
-        return _error;
-    }
-
-    public override string ToString()
-    {
-        return IsSuccess ? "Success" : $"Failure({_error.Code}): {_error.Message}";
-    }
+    /// <returns>A string representing the value.</returns>
+    public override string? ToString() => _state.ToString();
 }

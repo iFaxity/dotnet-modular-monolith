@@ -30,10 +30,10 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IResult<T> RecoverWith(Func<IError, T> mapValue)
         {
-            if (!Result.TryUnwrapError(result, out var error))
+            if (result is not IFailure failure)
                 return result;
 
-            var mappedValue = mapValue(error);
+            var mappedValue = mapValue(failure.Error);
 
             return Result.Success(mappedValue);
         }
@@ -52,10 +52,10 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<IResult<T>> RecoverWith(Func<IError, Task<T>> mapValue)
         {
-            if (!Result.TryUnwrapError(result, out var error))
+            if (result is not IFailure failure)
                 return result;
 
-            var mappedValue = await mapValue(error);
+            var mappedValue = await mapValue(failure.Error);
 
             return Result.Success(mappedValue);
         }

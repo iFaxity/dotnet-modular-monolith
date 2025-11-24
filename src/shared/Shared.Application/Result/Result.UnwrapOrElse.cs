@@ -10,19 +10,19 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T UnwrapOrElse(Func<T> mapDefault)
         {
-            if (!Result.TryUnwrap(result, out var value))
+            if (result is not ISuccess<T> success)
                 return mapDefault();
 
-            return value;
+            return success.Value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task<T> UnwrapOrElse(Func<Task<T>> mapDefault)
         {
-            if (!Result.TryUnwrap(result, out var value))
+            if (result is not ISuccess<T> success)
                 return mapDefault();
 
-            return Task.FromResult(value);
+            return Task.FromResult(success.Value);
         }
     }
 

@@ -22,16 +22,25 @@ public static partial class ResultExtensions
             result.IsSuccess ? onSuccess() : onFailure();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TResult Match<TResult>(TResult onSuccess, Func<IError, TResult> onFailure) =>
-            result.Match(() => onSuccess, onFailure);
+        public TResult Match<TResult>(TResult onSuccess, Func<IError, TResult> onFailure)
+        {
+            return result switch
+            {
+                ISuccess => onSuccess,
+                IFailure failure => onFailure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TResult Match<TResult>(Func<TResult> onSuccess, Func<IError, TResult> onFailure)
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return onSuccess();
-
-            return onFailure(error);
+            return result switch
+            {
+                ISuccess => onSuccess(),
+                IFailure failure => onFailure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
     }
 
@@ -39,33 +48,65 @@ public static partial class ResultExtensions
         where T : notnull
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TResult Match<TResult>(Func<T, TResult> onSuccess, TResult onFailure) =>
-            result.Match(onSuccess, _ => onFailure);
+        public TResult Match<TResult>(Func<T, TResult> onSuccess, TResult onFailure)
+        {
+            return result switch
+            {
+                ISuccess<T> success => onSuccess(success.Value),
+                IFailure => onFailure,
+                _ => throw new InvalidOperationException(),
+            };
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<IError, TResult> onFailure)
         {
-            if (Result.TryUnwrap(result, out var value))
-                return onSuccess(value);
-
-            return onFailure(result.UnwrapError());
+            return result switch
+            {
+                ISuccess<T> success => onSuccess(success.Value),
+                IFailure failure => onFailure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Task<TResult> Match<TResult>(Func<T, Task<TResult>> onSuccess, TResult onFailure) =>
-            result.Match(onSuccess, _ => Task.FromResult(onFailure));
+        public Task<TResult> Match<TResult>(Func<T, Task<TResult>> onSuccess, TResult onFailure)
+        {
+            return result switch
+            {
+                ISuccess<T> success => onSuccess(success.Value),
+                IFailure => Task.FromResult(onFailure),
+                _ => throw new InvalidOperationException(),
+            };
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task<TResult> Match<TResult>(
             Func<T, Task<TResult>> onSuccess,
             Func<IError, TResult> onFailure
-        ) => result.Match(onSuccess, (error) => Task.FromResult(onFailure(error)));
+        )
+        {
+            return result switch
+            {
+                ISuccess<T> success => onSuccess(success.Value),
+                IFailure failure => Task.FromResult(onFailure(failure.Error)),
+                _ => throw new InvalidOperationException(),
+            };
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task<TResult> Match<TResult>(
             Func<T, TResult> onSuccess,
             Func<IError, Task<TResult>> onFailure
-        ) => result.Match((value) => Task.FromResult(onSuccess(value)), onFailure);
+        )
+        {
+            return result switch
+            {
+                ISuccess<T> success => Task.FromResult(onSuccess(success.Value)),
+                IFailure failure => onFailure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task<TResult> Match<TResult>(
@@ -73,10 +114,12 @@ public static partial class ResultExtensions
             Func<IError, Task<TResult>> onFailure
         )
         {
-            if (Result.TryUnwrap(result, out var value))
-                return onSuccess(value);
-
-            return onFailure(result.UnwrapError());
+            return result switch
+            {
+                ISuccess<T> success => onSuccess(success.Value),
+                IFailure failure => onFailure(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
     }
 

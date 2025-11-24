@@ -10,10 +10,12 @@ public static partial class ResultExtensions
         public IResult<T> And<T>(IResult<T> other)
             where T : notnull
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return other;
-
-            return Result.Failure<T>(error);
+            return result switch
+            {
+                ISuccess => other,
+                IFailure failure => Result.Failure<T>(failure.Error),
+                _ => throw new InvalidOperationException(),
+            };
         }
     }
 

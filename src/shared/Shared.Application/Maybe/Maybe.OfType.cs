@@ -13,7 +13,6 @@ public static partial class MaybeExtensions
         /// </summary>
         /// <typeparam name="T">The type of the current value.</typeparam>
         /// <typeparam name="TResult">The target type to cast to.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <returns>A maybe of the downcasted value or <c>None</c>.</returns>
         public IMaybe<TResult> OfType<TResult>()
             where TResult : class

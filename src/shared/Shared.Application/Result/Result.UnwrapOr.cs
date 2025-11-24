@@ -12,10 +12,12 @@ public static partial class ResultExtensions
         [return: NotNullIfNotNull(nameof(defaultValue))]
         public T? UnwrapOr(T? defaultValue)
         {
-            if (!Result.TryUnwrap(result, out var value))
-                return defaultValue;
-
-            return value;
+            return result switch
+            {
+                ISuccess<T> success => success.Value,
+                IFailure => defaultValue,
+                _ => throw new InvalidOperationException(),
+            };
         }
     }
 

@@ -15,7 +15,7 @@ public static partial class ResultExtensions
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerable<IError> SelectErrors() =>
-            results.Where(result => result.IsFailure).Select(result => result.UnwrapError());
+            results.OfType<IFailure>().Select(failure => failure.Error);
     }
 
     extension(Task<IEnumerable<IResult>> resultsTask)

@@ -45,10 +45,10 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IResult<T> MapError(Func<IError, IError> map)
         {
-            if (!Result.TryUnwrapError(result, out var error))
+            if (result is not IFailure<T> failure)
                 return result;
 
-            var mappedError = map(error);
+            var mappedError = map(failure.Error);
 
             return Result.Failure<T>(mappedError);
         }
@@ -67,10 +67,10 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<IResult<T>> MapError(Func<IError, Task<IError>> map)
         {
-            if (!Result.TryUnwrapError(result, out var error))
+            if (result is not IFailure<T> failure)
                 return result;
 
-            var mappedError = await map(error);
+            var mappedError = await map(failure.Error);
 
             return Result.Failure<T>(mappedError);
         }

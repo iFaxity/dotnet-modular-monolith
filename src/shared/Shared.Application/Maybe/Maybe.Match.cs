@@ -13,9 +13,7 @@ public static partial class MaybeExtensions
         /// <summary>
         /// Matches a maybe value to a result or returning a fallback value.
         /// </summary>
-        /// <typeparam name="T">The type of the maybe value.</typeparam>
         /// <typeparam name="TResult">The type of the result value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="some">Result if value is present.</param>
         /// <param name="none">Fallback value if no value is present.</param>
         /// <returns>The result of the match.</returns>
@@ -37,27 +35,29 @@ public static partial class MaybeExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TResult Match<TResult>(Func<T, TResult> mapSome, TResult none)
         {
-            if (!Maybe.TryUnwrap(maybe, out var value))
-                return none;
-
-            return mapSome(value);
+            return maybe switch
+            {
+                ISome<T> some => mapSome(some.Value),
+                INone => none,
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TResult Match<TResult>(Func<T, TResult> mapSome, Func<TResult> mapNone)
         {
-            if (!Maybe.TryUnwrap(maybe, out var value))
-                return mapNone();
-
-            return mapSome(value);
+            return maybe switch
+            {
+                ISome<T> some => mapSome(some.Value),
+                INone => mapNone(),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         /// <summary>
         /// Asynchronously matches a maybe value to a result or returns a fallback value.
         /// </summary>
-        /// <typeparam name="T">The type of the maybe value.</typeparam>
         /// <typeparam name="TResult">The type of the result value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="mapSome">Async function to execute if value is present.</param>
         /// <param name="none">Fallback result if value is not present.</param>
         /// <returns>A task returning the match result.</returns>
@@ -67,9 +67,7 @@ public static partial class MaybeExtensions
         /// <summary>
         /// Asynchronously matches a maybe value to a result by executing one of two functions.
         /// </summary>
-        /// <typeparam name="T">The type of the maybe value.</typeparam>
         /// <typeparam name="TResult">The type of the result value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="mapSome">Async function if value is present.</param>
         /// <param name="mapNone">Sync function if no value is present.</param>
         /// <returns>A task returning the match result.</returns>
@@ -81,9 +79,7 @@ public static partial class MaybeExtensions
         /// <summary>
         /// Fully asynchronous match operation using asynchronous branches.
         /// </summary>
-        /// <typeparam name="T">The type of the maybe value.</typeparam>
         /// <typeparam name="TResult">The type of the result value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="mapSome">Async function to call if value is present.</param>
         /// <param name="mapNone">Async function to call if value is not present.</param>
         /// <returns>A task returning the match result.</returns>
@@ -92,27 +88,29 @@ public static partial class MaybeExtensions
             Func<Task<TResult>> mapNone
         )
         {
-            if (!Maybe.TryUnwrap(maybe, out var value))
-                return mapNone();
-
-            return mapSome(value);
+            return maybe switch
+            {
+                ISome<T> some => mapSome(some.Value),
+                INone => mapNone(),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         /// <summary>
         /// Matches a maybe value and executes an async fallback if <c>None</c>.
         /// </summary>
-        /// <typeparam name="T">The type of the maybe value.</typeparam>
         /// <typeparam name="TResult">The type of the result value.</typeparam>
-        /// <param name="maybe">The maybe instance.</param>
         /// <param name="mapSome">Function to call if value is present.</param>
         /// <param name="mapNone">Async function to call if value is not present.</param>
         /// <returns>A task returning the match result.</returns>
         public Task<TResult> Match<TResult>(Func<T, TResult> mapSome, Func<Task<TResult>> mapNone)
         {
-            if (!Maybe.TryUnwrap(maybe, out var value))
-                return mapNone();
-
-            return Task.FromResult(mapSome(value));
+            return maybe switch
+            {
+                ISome<T> some => Task.FromResult(mapSome(some.Value)),
+                INone => mapNone(),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -10,18 +10,17 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TResult IfFailure(Action action)
         {
-            if (result.IsSuccess)
-                return result;
+            if (result.IsFailure)
+                action();
 
-            action();
             return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TResult IfFailure(Action<IError> action)
         {
-            if (Result.TryUnwrapError(result, out var error))
-                action(error);
+            if (result is IFailure failure)
+                action(failure.Error);
 
             return result;
         }
@@ -29,10 +28,8 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<TResult> IfFailure(Func<Task> action)
         {
-            if (result.IsSuccess)
-                return result;
-
-            await action();
+            if (result.IsFailure)
+                await action();
 
             return result;
         }
@@ -40,10 +37,9 @@ public static partial class ResultExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public async Task<TResult> IfFailure(Func<IError, Task> action)
         {
-            if (!Result.TryUnwrapError(result, out var error))
-                return result;
+            if (result is IFailure failure)
+                await action(failure.Error);
 
-            await action(error);
             return result;
         }
     }
